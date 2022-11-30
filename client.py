@@ -26,8 +26,8 @@ if message == "arret" or message == "bye":
     client_socket.close()
 else:
     data = client_socket.recv(1024).decode()
-    print("Message reçu du serveur:")
-    print(data)
+    '''print("Message reçu du serveur:")
+    print(data)'''
     if data == "arret":
         print("Connexion terminé.")
         client_socket.close()
