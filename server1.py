@@ -3,6 +3,7 @@ import  os
 import psutil
 import platform
 
+
 #host devra changer avec un ficher CSV 
 
 server_socket = socket.socket()
@@ -41,7 +42,7 @@ def ram():
 def cpu():
     print('CPU % used:', psutil.cpu_percent())
     print('The CPU usage is: ', psutil.cpu_percent(4), '%')
-def os():
+def osn():
     print('OS:', platform.system(), "version", platform.release())
 def ip():
     print("L'addresse IP de la machine est :", IPAddr)
@@ -49,6 +50,13 @@ def name():
     print('Le nom de la machine est :', platform.node())
     '''on peut aussi faire hostname = socket.gethostname()
         print("Your Computer Name is:" + hostname)'''
+def dir():
+# Using listdir() function.
+    listOfFileNames = os.listdir()
+    # Print the name of all files in the current working directory.
+    print("Following is the list of names of all the files present in the current working directory: ")
+    print(listOfFileNames)
+
 
 
 while data !="arret":
@@ -63,13 +71,20 @@ while data !="arret":
     elif data == "cpu":
         cpu()
     elif data == "os":
-        os()
+        osn()
     elif data == "ip":
         ip()
     elif data == "name":
         name()
+    elif data =="dos:dir":
+        dir()
+    #elif data =="dos:mkdir":
+        #split apres : 
+        #partie apres : va dans vartiable 
+        #cmd = data.split(":")
+        #os.system(cmd2)
     else:
-        print("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
+        print("La commande n'existe pas cliquer sur l'aide ou taper --help pour pour voir l'ensemble des commandes possibles")
         #faire un truc qui change la couleur du texte de aide dans la IG du client
         pass
     print("Réponse envoyé")
