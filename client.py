@@ -1,31 +1,29 @@
-import socket
-import  os 
-import psutil
-import platform
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import * 
+from PyQt6.QtCore import *
+import socket
 import sys
-from requests import Session
-#on va faire un ficher pour lancer tt les serveurs en meme temps ensuite en fonction des num on pourra choisir le serveur
-"""
-client_socket = socket.socket()
-print("Socket créé.")
+import psutil
+#import netifaces
+import netaddr
+import shutil
+from PyQt6.QtGui import QShortcut, QKeySequence
+
+
+os = ("")
+cpu = psutil.cpu_count()
+name =("")
+ip = socket.gethostbyname(name)
 host = "localhost"
-port = input("Choisissez le serveur de connexion : ")
+#netifaces.interfaces()
+stockage = ("")
+#adresse_ip = netifaces.ifaddresses('en0')[2][0]['addr'] # en0 = ethernet,si votre adresse ip est sur une autre interface il faudra changer "en0" par le nom de l'interface
+#netaddr_adresse_ip = netaddr.IPAddress(adresse_ip)
+stockage = shutil.disk_usage("/")
+help =""
 
-if port == "1":
-    port = 1111
-elif port == "2":
-    port = 10000
-else:
-    print("Serveur introuvable !")
 
-client_socket.connect((host, port))
-print("Connecté au serveur.")
-message =input("envoi d'un message : ")
-client_socket.send(message.encode())
-print("Message envoyé")
-"""
+port = 7000
+
 
 
 
@@ -33,151 +31,184 @@ print("Message envoyé")
 class client(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Client")
+        self.setWindowTitle("SAE 302")
         grid = QGridLayout()
         widget = QWidget()
-        self.setCentralWidget(widget) 
+        self.setCentralWidget(widget)
         widget.setLayout(grid)
-        self.label = QTextEdit()
+
+
+        rama = QPushButton("RAM")
+        cpuu = QPushButton("CPU")
+        ipp = QPushButton("IP")
+        oss = QPushButton("OS")
+        namee = QPushButton("NAME")
+        #pingg = QPushButton("Ping")
+        #porto= QPushButton("Port")
+        #disque = QPushButton("Disque")
+        quitter = QPushButton("Quit")
+        self.label = QTextEdit("")
+        help = QPushButton("Help")
+        clear = QPushButton("clear")
+        envoyer = QPushButton("Envoyer")
+        self.__conn = QPushButton("connect")
+        #en = QLabel("Entrer votre commande")
+        self.__input = QLineEdit() 
+        self.__input.setMaxLength(100)
+        self.__input.setPlaceholderText("Entrez votre commande")
+
+#style css de l'interface
+ 
+        with open("styles.css","r") as file:
+            app.setStyleSheet(file.read())
+            
+
+
+        self.__conn.setStyleSheet("color: #ffc0cb ")
+        clear.setStyleSheet("""
+        QPushButton {
+            color: #ffc0cb;
+        }
+        QPushButton:hover {
+            color: #db7093;
+        }
+    """)
+        quitter.setStyleSheet("""
+        QPushButton {
+            color: #ffc0cb;
+        }
+        QPushButton:hover {
+            color: #db7093;
+        }
+    """)
+
+        #quitter.setStyleSheet("color: #db7093")
+        #self.__conn.setStyleSheet("color: white")
+        #self.__conn.setStyleSheet("border-radius: 10px ,")
+
+#PARTIE GRID
+    
+        grid.addWidget(rama, 0, 0)
+        grid.addWidget(cpuu, 1, 0)
+        grid.addWidget(ipp, 2, 0)
+        grid.addWidget(oss, 3, 0)
+        grid.addWidget(namee, 4, 0)
+        grid.addWidget(self.__conn,5,0)
+        #grid.addWidget(pingg, 5, 0)
+        #grid.addWidget(porto, 9, 0)
+        #grid.addWidget(disque, 6, 0)
+        grid.addWidget(quitter, 0  ,12)
+        grid.addWidget(clear, 5,12)
+        grid.addWidget(self.label, 0, 1, 5, 11)
+        grid.addWidget(help,1,12)
+        grid.addWidget(envoyer, 5, 11)
+        grid.addWidget(self.__input,  5,1,1,10)
         
+#PARTIE DES ACTIONS
 
-        name = 'shad' # Enter your name here!
-        chat_url = 'https://build-system.fman.io/chat'
-        server = Session()
+        rama.clicked.connect(self.__actionram)
+        cpuu.clicked.connect(self.__actioncpu)
+        ipp.clicked.connect(self.__actionip)
+        oss.clicked.connect(self.__actionos)
+        namee.clicked.connect(self.__actionname)
+        #porto.clicked.connect(self.__actionport)
+        #pingg.clicked.connect(self.__actionping)
+        #disque.clicked.connect(self.__actiondisque)
+        envoyer = QShortcut(QKeySequence("Enter"), self)
+        envoyer.activated.connect(self.__actionenvoyer)
+        help.clicked.connect(self.__actionhelp)
+        clear.clicked.connect(self.__actionclear)
+        #btn.clicked.connect(self.__actionbtn)
 
-        ram= QPushButton("ram")
-        cpu=QPushButton("cpu")
-        name=QPushButton("name")
-        
-        #ok#
-        text_area = QTextEdit()
-        text_area.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        message = QLineEdit()
-        layout = QVBoxLayout()
-        layout.addWidget(text_area)
-        layout.addWidget(message)
+#PARTIE FONCTION
+    #def __actionenvoyer(self):
 
-        #evenement
+    def __actionenvoyer(self):
+        message = self.__input.text()
+        client_socket.send(message.encode())
+        print("La requête a été envoyée")
+        data = client_socket.recv(1024).decode()
+        print(f"Message du serveur : {data}")
+        self.label.append(f"{data}\n")
+        self.__input.clear()
 
-        # Event handlers:
-        def display_new_messages():
-            new_message = server.get(chat_url).text
-            if new_message:
-                text_area.append(new_message)
-
-        def send_message():
-            server.post(chat_url, {'name': name, 'message': message.text()})
-            message.clear()
-
-        # Signals:
-        message.returnPressed.connect(send_message)
-        timer = QTimer()
-        timer.timeout.connect(display_new_messages)
-        timer.start(1000)
-
-        
-
-        
-
-
-        grid.addWidget(ram, 0, 0)
-        grid.addWidget(cpu , 1, 0)
-        grid.addWidget(name, 2, 0)
-        grid.addWidget(text_area, 0, 1, 3, 1)
-        grid.addWidget(message, 3, 0, 1, 2)
-        
     
 
-        ram.clicked.connect(self.__actionram)
-        cpu.clicked.connect(self.__actioncpu)
-        name.clicked.connect(self.__actionname)
-        
 
-        #on essaye
+    def __actionclear(self):
+        self.label.clear()
+        self.label.append("")
 
-        
-        #on essaye 
-
+    def __actionhelp(self):
+        message = QMessageBox()
+        message.setText("Commande disponible:\n \n - La commande ram permet d'afficher la ram totale, la ram utilisée et la ram libre \
+            \n \n - La commande ip permet d'afficher l'adresse ip de la machine \
+            \n \n  - La commande os permet d'afficher le nom de l'os\
+            \n \n - La commande name permet d'afficher le nom de la machine\
+            \n \n - La commande port permet d'afficher le port utilisé  \
+            \n \n - La commande cpu permet d'afficher le nombre de coeur de la machine \
+            \n \n - La commande disque permet d'afficher le stockage total, le stockage utilisé et le stockage libre")
+        message.exec()   
+    
 
     def __actionram(self):
         message = "ram"
         client_socket.send(message.encode())
         print("La requête pour la ram a été envoyée")
         data = client_socket.recv(1024).decode()
-        
-        print(f"Message du serveur : {data}")
+        print(f"Message du serveur : Voici vos statistiques sur la ram{data}")
         self.label.append(f"{data}\n")
-        self.label.append(f"")
         
-        
-   
 
-    def __actioncpu(self):
-        message = "cpu"
+
+    def __actionip(self):
+        message = "ip"
         client_socket.send(message.encode())
-        print("La requête pour la cpu a été envoyée")
+        print("La requête pour l'ip a été envoyée")
         data = client_socket.recv(1024).decode()
-        print(f"Message du serveur : {data}")
-        self.label.append(f"{data}\n")
-
+        print(f"Message du serveur : Votre ip est {data}")
+        self.label.append(f" IP: {data} \n")
+    
+    def __actionos(self):
+        message = "os"
+        client_socket.send(message.encode())
+        print("La requête pour l'os a été envoyée")
+        data = client_socket.recv(1024).decode()
+        print(f"Message du serveur : Vous êtes sur l'OS  {data}")
+        self.label.append(f" OS: {data} \n")
+        
+    
     def __actionname(self):
         message = "name"
         client_socket.send(message.encode())
         print("La requête pour le nom a été envoyée")
         data = client_socket.recv(1024).decode()
-        print(f"Message du serveur : {data}")
-        self.label.append(f"{data}\n")
+        print(f"Message du serveur : Le nom de votre machine est  {data}")
+        self.label.append(f" Name: {data} \n")
+    
 
-"""
-if message == "arret" or message == "bye":
-    print("Connexion terminé.")
-    client_socket.close()
+   
+    def __actioncpu(self):
+        message="cpu"
+        client_socket.send(message.encode())
+        print("La requête pour le cpu a été envoyée")
+        data = client_socket.recv(1024).decode()
+        print(f"Message du serveur : Le cpu est utilisé à {data} %")
+        self.label.append(f" CPU USAGE: {cpu} % \n")
+        
+  
 
-elif message == "ram":
-    __actionram(self)
-elif message == "cpu":
-    __actioncpu(self)   
-else:
-    data = client_socket.recv(1024).decode()
-    '''print("Message reçu du serveur:")
-    print(data)'''
-    if data == "arret":
-        print("Connexion terminé.")
-        client_socket.close()
 
-    else:
-        while data !="bye":
-            message = input("envoi d'un message : ")
-            client_socket.send(message.encode())
-            print("Message envoyé")
-            if message == "arret" or message == "bye":
-                print("Connexion terminé.")
-                client_socket.close()
-                break
-            data = client_socket.recv(1024).decode()
-            print("Message reçu du serveur:")
-            print(data)
-            if data == "arret":
-                print("Connexion terminé.")
-                client_socket.close()
-                break
-"""
 
-if __name__=="__main__":
+
+
+
+if __name__ == "__main__":
+
+    print(f"Ouverture de la socket sur le serveur {host} port {port}")
     client_socket = socket.socket()
-    print("Socket créé.")
-    host = "localhost"
-    port = input("Choisissez le serveur de connexion : ")
-
-    if port == "1":
-        port = 1111
-    elif port == "2":
-        port = 10000
-    else:
-        print("Serveur introuvable !")
-
     client_socket.connect((host, port))
-    print("Connecté au serveur.")
+    print("Serveur est connecté")
 
     app = QApplication(sys.argv)
     window = client()

@@ -1,158 +1,139 @@
+import sys
+from PyQt6.QtWidgets import QApplication, QWidget #pip install PyQt6
+import psutil #pip install psutil # https://pypi.org/project/psutil/ # https://psutil.readthedocs.io/en/latest/ 
+import platform #pip install platform # https://pypi.org/project/platform/ # https://docs.python.org/3/library/platform.html
+import socket #pip install socket # https://pypi.org/project/socket/ # https://docs.python.org/3/library/socket.html
+#import netifaces #pip install netifaces # https://pypi.org/project/netifaces/ # https://netifaces.readthedocs.io/en/latest/
+import netaddr #pip install netaddr # https://pypi.org/project/netaddr/ # https://netaddr.readthedocs.io/en/latest/
+import os
 import socket
-import  os 
-import psutil
-import platform
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
 
 
-#host devra changer avec un ficher CSV 
+
+host = socket.gethostname()
+ram = psutil.virtual_memory() 
+ram1 = ram[0]/1000000000
+ram2 = ram[1]/1000000000
+ram3 = ram[3]/1000000000
+'''ping = os.system("ping -c 1 " + host)
+if ping == 0:
+    pingstatus = "Network Active"
+    print("Le ping a fonctionné")
+else:
+    pingstatus = "Network Error"
+    print("Le ping n'a pas fonctionné")
+'''
+stockage = psutil.disk_usage("/")
+stockage1 = stockage[0]/1000000000
+stockage2 = stockage[1]/1000000000
+stockage3 = stockage[2]/1000000000
+
+cpu = psutil.cpu_count()
+name = socket.gethostname()
+ip = socket.gethostbyname(name)
+
+ip = socket.gethostbyname(host)
+#adresse_ip = netifaces.ifaddresses('en0')[2][0]['addr'] # en0 = ethernet,si votre adresse ip est sur une autre interface il faudra changer "en0" par le nom de l'interface
+#netaddr_adresse_ip = netaddr.IPAddress(adresse_ip)
+
+
+host = "localhost" # "", "127.0.0.1
+port = 7000
 
 server_socket = socket.socket()
-print("Socket crée.")
-host = "localhost"
-port = 1111
 server_socket.bind((host, port))
-print("Socket sur l'adresse {} et le port {}".format(host, port))
 server_socket.listen(1)
-hostname = socket.gethostname()
-IPAddr = socket.gethostbyname(hostname)
-str_2 = psutil.cpu_percent()
 
-print("En attente du client")
+print('En attente du client')
 conn, address = server_socket.accept()
-print("Conexion établie avec le client {}".format(address))
+print(f'Client connecté {address}')
 
-
-
-
-mem_usage = psutil.virtual_memory()
-
-
-
+print("Socket sur l'adresse {} et le port {}".format(host, port))
 data = conn.recv(1024).decode()
-data = data.lower()
-
-# DIFFERENTES FONCTIONS 
-
-def ram():
-    str_1 = mem_usage.percent
-    str_2 = mem_usage.total/(1024**3)
-    
-    #str_2 = psutil.cpu_percent(4)
-    #conn = str("CPU % used:", psutil.cpu_percent())
-    #server_socket.send(rep.encode())
-    
-    #print('The CPU usage is: ', psutil.cpu_percent(4), '%')
-    rep = str(f"La RAM Libre est: {str_1} % \nLa RAM Utilisé est: {str_2}")
-    conn.send(rep.encode())
-    
  
-    
-    
-    #print(f"RAM Totale: {mem_usage.total/(1024**3):.2f}G")
-    #print(f"RAM Libre: {mem_usage.percent}%")
-    #print(f"RAM Utilisé: {mem_usage.used/(1024**3):.2f}G")
-    #print('RAM memory % used:', psutil.virtual_memory()[2])
-    # Getting usage of virtual_memory in GB ( 4th field)
-    #print('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
-def cpu():
-    str_1 = psutil.cpu_percent()
-    str_2 = psutil.cpu_percent(4)
-    #conn = str("CPU % used:", psutil.cpu_percent())
-    #server_socket.send(rep.encode())
-    
-    #print('The CPU usage is: ', psutil.cpu_percent(4), '%')
-    rep = str(f" The CPU used is: {str_1} \n The CPU usage is: {str_2} %")
-    conn.send(rep.encode())
-    #
-    # 
-    # print(rep)
-    
+while data != "kill":
+    if data == "kill" or data == "kill":
+        break
 
-
-    #server_socket.send(rep.encode())
-def osn():
-    print('OS:', platform.system(), "version", platform.release())
-    #server_socket.send(data.encode())
-def ip():
-    #rep= str("L'addresse IP de la machine est :", IPAddr)
-    print("L'addresse IP de la machine est :", IPAddr)
-    #server_socket.send(rep.encode())
-def name():
-    print('Le nom de la machine est :', platform.node())
-    '''on peut aussi faire hostname = socket.gethostname()
-        print("Your Computer Name is:" + hostname)'''
-def dir():
-# Using listdir() function.
-    listOfFileNames = os.listdir()
-    # Print the name of all files in the current working directory.
-    print("Following is the list of names of all the files present in the current working directory: ")
-    print(listOfFileNames)
-
-
-
-while data !="arret":
-    #conn.recv(1024).decode()
-    #data = conn.recv(1024).decode()
-    #data = data.lower()
-    #reply = ("saisir un message: ")
-    #conn.send(reply.encode())
-
-    reply = ("saisir un message: ")
-    conn.send(reply.encode())
-    print("Réponse envoyé")
-    data = conn.recv(1024).decode()
-    print(f"Message {data} reçue du client:")
-
-
-    data = data.lower()
-    
-
-    if data == "arret":
-        print("Connexion terminé")
-        conn.close()
     elif data == "ram":
-        print("RAM")
-        ram()
-        pass
-    elif data == "cpu":
-        print("CPU")
-        cpu()
-        pass
-    elif data == "os":
-        osn()
-    elif data == "ip":
-        ip()
-    elif data == "name":
-        name()
-    elif data =="dos:dir":
-        dir()
-    elif data.startswith("dos:") and platform.system() == "Windows":
-        #split apres : 
-        #partie apres : va dans vartiable 
-        cmd = data.split(":")
-        os.system(cmd[1])
-        conn.send.data(cmd)
+        reply = str(f"\nRAM Total: {round(ram1, 2)} GB \nRAM Disponible: {round(ram2,2)} GB \nRAM Utilisée : {round(ram3,2)} GB")  
+        conn.send(reply.encode())
+        print("Message ram envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
 
-    elif data.startswith("Linux:") and platform.system() == "Linux":
-        cmd = data.split(":")
-        os.system(cmd[1])
-        print("ok")
-    else:
-        print("La commande n'existe pas cliquer sur l'aide ou taper --help pour pour voir l'ensemble des commandes possibles")
-        #faire un truc qui change la couleur du texte de aide dans la IG du client
-        pass
-
-    reply = ("le message a bien été reçu")
-    conn.send(reply.encode())
-
-print(f"Message {data} reçue du client:")
-print("Réponse envoyé")
-    #data = conn.recv(1024).decode()
-    
-    
    
 
-print("Connexion terminé.")
+    elif data == "cpu":
+        str_1 = psutil.cpu_percent()
+        str_2 = psutil.cpu_percent(4)
+        reply = str(f" The CPU used is: {str_1} \n The CPU usage is: {str_2} %")
+        conn.send(reply.encode())
+        print("Message cpu envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu :  {data} ")
+
+
+    elif data == "name":
+        reply = str(name)
+        conn.send(reply.encode())
+        print("Message name envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+
+    
+    elif data == "ip":
+        #reply = str(netaddr_adresse_ip)
+        conn.send(reply.encode())
+        print("Message ip envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+
+
+    elif data == "os":
+        str_1 = platform.system()   
+        str_2 = platform.release()
+        reply = str(f"System: {str_1} \nRelease: {str_2}")
+        conn.send(reply.encode())
+        print("Message os envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+
+    elif data == "port":
+        reply = str(port)
+        conn.send(reply.encode())
+        print("Message port envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+    
+    elif data == "stockage":
+        reply = str(f"Espace total: {round(stockage1, 2)} GB \nEspace  Disponible: {round(stockage2,2)} GB \nEspace libre : {round(stockage3,2)} GB")
+        conn.send(reply.encode())
+        print("Message disque envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+
+    elif data =="ping":
+        reply = os.system("ping -c 4 " + host)
+        if reply == 0:
+            pingstatus = "Network Active"
+            print("Le ping a fonctionné")
+        else:
+            pingstatus = "Network Error"
+            print("Le ping n'a pas fonctionné")
+
+    else:
+        message = input("Message au client ->")
+        print("Message envoyé")
+        conn.send(message.encode())
+        data = conn.recv(1024).decode()
+        print(f"Message du client :{message}")
+    
+
+
+
+# Fermeture
 conn.close()
+print("Fermeture de la socket client")
+server_socket.close()
+print("Fermeture de la socket serveur")
