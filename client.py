@@ -36,7 +36,7 @@ class client(QMainWindow):
         widget = QWidget()
         self.setCentralWidget(widget)
         widget.setLayout(grid)
-
+        self.resize(537, 250)
 
         rama = QPushButton("RAM")
         cpuu = QPushButton("CPU")
@@ -64,7 +64,15 @@ class client(QMainWindow):
             
 
 
-        self.__conn.setStyleSheet("color: #ffc0cb ")
+        self.__conn.setStyleSheet("""
+        QPushButton {
+            color: #ffc0cb;
+        }
+        QPushButton:hover {
+            color: #db7093;
+        }
+        """)
+
         clear.setStyleSheet("""
         QPushButton {
             color: #ffc0cb;
@@ -72,7 +80,7 @@ class client(QMainWindow):
         QPushButton:hover {
             color: #db7093;
         }
-    """)
+        """)
         quitter.setStyleSheet("""
         QPushButton {
             color: #ffc0cb;
@@ -80,7 +88,27 @@ class client(QMainWindow):
         QPushButton:hover {
             color: #db7093;
         }
-    """)
+        """)
+
+    
+
+    #modifier la scrollbar
+        self.label.setStyleSheet("""
+        QScrollBar:vertical {
+            width: 10px;
+            background-color: #3d3d3d;
+        }
+        QScrollBar::handle:vertical {
+            background: #3d3d3d;
+            border-radius: 5px;
+            border: 1px solid;
+        }
+        QScrollBar::add-line:vertical {
+            background: #ffc0cb;
+            height: 0px;
+            subcontrol-position: top;
+            subcontrol-origin: margin;
+        }""")
 
         #quitter.setStyleSheet("color: #db7093")
         #self.__conn.setStyleSheet("color: white")
@@ -114,7 +142,9 @@ class client(QMainWindow):
         #porto.clicked.connect(self.__actionport)
         #pingg.clicked.connect(self.__actionping)
         #disque.clicked.connect(self.__actiondisque)
-        envoyer = QShortcut(QKeySequence("Enter"), self)
+        envoyer.clicked.connect(self.__actionenvoyer)
+        quitter.clicked.connect(self.__actionquitter)
+        envoyer = QShortcut(QKeySequence("Return"), self)
         envoyer.activated.connect(self.__actionenvoyer)
         help.clicked.connect(self.__actionhelp)
         clear.clicked.connect(self.__actionclear)
@@ -130,7 +160,22 @@ class client(QMainWindow):
         data = client_socket.recv(1024).decode()
         print(f"Message du serveur : {data}")
         self.label.append(f"{data}\n")
+        self.__actionreinitialiser()
+
+    def __actionreinitialiser(self):
         self.__input.clear()
+        self.__input.setPlaceholderText("Entrez la prochaine commande")
+    
+    
+
+  
+    
+    
+
+    def __actionquitter(self):
+        self.close()
+
+
 
     
 
@@ -143,7 +188,7 @@ class client(QMainWindow):
         message = QMessageBox()
         message.setText("Commande disponible:\n \n - La commande ram permet d'afficher la ram totale, la ram utilisée et la ram libre \
             \n \n - La commande ip permet d'afficher l'adresse ip de la machine \
-            \n \n  - La commande os permet d'afficher le nom de l'os\
+            \n \n  - La commande os permet d'afficher le nom et la version de l'os\
             \n \n - La commande name permet d'afficher le nom de la machine\
             \n \n - La commande port permet d'afficher le port utilisé  \
             \n \n - La commande cpu permet d'afficher le nombre de coeur de la machine \
@@ -167,7 +212,7 @@ class client(QMainWindow):
         print("La requête pour l'ip a été envoyée")
         data = client_socket.recv(1024).decode()
         print(f"Message du serveur : Votre ip est {data}")
-        self.label.append(f" IP: {data} \n")
+        self.label.append(f"{data} \n")
     
     def __actionos(self):
         message = "os"
@@ -175,7 +220,7 @@ class client(QMainWindow):
         print("La requête pour l'os a été envoyée")
         data = client_socket.recv(1024).decode()
         print(f"Message du serveur : Vous êtes sur l'OS  {data}")
-        self.label.append(f" OS: {data} \n")
+        self.label.append(f"{data} \n")
         
     
     def __actionname(self):
@@ -184,7 +229,7 @@ class client(QMainWindow):
         print("La requête pour le nom a été envoyée")
         data = client_socket.recv(1024).decode()
         print(f"Message du serveur : Le nom de votre machine est  {data}")
-        self.label.append(f" Name: {data} \n")
+        self.label.append(f"{data} \n")
     
 
    
@@ -194,7 +239,7 @@ class client(QMainWindow):
         print("La requête pour le cpu a été envoyée")
         data = client_socket.recv(1024).decode()
         print(f"Message du serveur : Le cpu est utilisé à {data} %")
-        self.label.append(f" CPU USAGE: {cpu} % \n")
+        self.label.append(f"{data} \n")
         
   
 
