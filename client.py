@@ -158,6 +158,7 @@ class client(QMainWindow):
         client_socket.send(message.encode())
         print("La requête a été envoyée")
         data = client_socket.recv(1024).decode()
+        
         print(f"Message du serveur : {data}")
         self.label.append(f"{data}\n")
         self.__actionreinitialiser()

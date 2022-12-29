@@ -111,28 +111,78 @@ while data != "kill":
         data = conn.recv(1024).decode()
         print(f"Message reçu : {data}")
         
-    elif data == "stockage":
-        reply = str(f"Espace total: {round(stockage1, 2)} GB \nEspace  Disponible: {round(stockage2,2)} GB \nEspace libre : {round(stockage3,2)} GB")
-        conn.send(reply.encode())
-        print("Message disque envoyé")
-        data = conn.recv(1024).decode()
-        print(f"Message reçu : {data}")
+    elif data.startswith("ping"):
+        try:
+            ip = data.split()[1] 
+            print (ip)
+            reply = os.system("ping -n 1 " + ip)
+            if reply == 0:
+                reply = "Network Active"
+                print("Le ping a fonctionné")
+                conn.send(reply.encode())
+                print("Message help envoyé")
+                data = conn.recv(1024).decode()
+                print(f"Message reçu : {data}")
+            else:
+                reply = "Network Error"
+                print("Le ping n'a pas fonctionné")
+                conn.send(reply.encode())
+                print("Message help envoyé")
+                data = conn.recv(1024).decode()
+                print(f"Message reçu : {data}")
 
-    elif data =="ping":
-        reply = os.system("ping -c 4 " + host)
-        if reply == 0:
-            pingstatus = "Network Active"
-            print("Le ping a fonctionné")
+        except:
+            print("Erreur de saisie")
+            conn.send("Erreur de saisie".encode())
+            #fichier = open('historique.txt', 'w')
+            #fichier.write(data + "\n")
+            #print("fait")
+            #fichier.close()
+
+
+
+    else:  
+        #split apres :
+        #verification 
+       
+        verif = os.system(data)
+        cmd = os.popen(data).read()
+
+# = 0 on a un resultat 
+        if verif == 0:
+            conn.send(cmd.encode())
+            print("Message help envoyé")
+            data = conn.recv(1024).decode()
+            print(f"Message reçu : {data}")
+
+
         else:
-            pingstatus = "Network Error"
-            print("Le ping n'a pas fonctionné")
+        #print("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
+            reply = ("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
+            conn.send(reply.encode())
+            print("Message port envoyé")
+            data = conn.recv(1024).decode()
+            print(f"Message reçu : {data}")
+            
+    
 
-    else:    
+        """platform.system() == "Windows"
+
+        val = os.system(data)
+
+        cmd = data.split(":")
+        #print(os.system(cmd[1]))
+        reply = str(os.system(cmd[1]))
+        conn.send(reply.encode())
+        print("Message help envoyé")
+        data = conn.recv(1024).decode()
+        #partie apres : va dans vartiable 
+        #os.system(cmd[1])   
         reply = ("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
         conn.send(reply.encode())
         print("Message port envoyé")
         data = conn.recv(1024).decode()
-        print(f"Message reçu : {data}")
+        print(f"Message reçu : {data}")"""
     
 
 
