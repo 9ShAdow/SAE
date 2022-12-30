@@ -56,7 +56,13 @@ data = conn.recv(1024).decode()
 
  
 while data != "kill":
+    ip = socket.gethostbyname(name)
     data = data.lower()
+    ficher = open("historique.txt", "a")
+    ficher.write(f"{data} \n")
+    ficher.close()
+    print(f"Message reçu : {data}")
+
     if data == "kill" or data == "kill":
         break
 
@@ -110,37 +116,79 @@ while data != "kill":
         print("Message help envoyé")
         data = conn.recv(1024).decode()
         print(f"Message reçu : {data}")
+    
         
     elif data.startswith("ping"):
-        try:
-            ip = data.split()[1] 
-            print (ip)
-            reply = os.system("ping -n 1 " + ip)
-            if reply == 0:
-                reply = "Network Active"
-                print("Le ping a fonctionné")
-                conn.send(reply.encode())
+        if platform.system() == "Windows":
+            try:
+                pong = data.split()[1] 
+                print (pong)
+                reply = os.system("ping -n 1 " + pong)
+                if reply == 0:
+                    reply = os.popen(data).read()
+                    print("Le ping a fonctionné")
+                    conn.send(reply.encode())
+                    print("Message help envoyé")
+
+                else:
+                    reply = "Network Error"
+                    print("Le ping n'a pas fonctionné")
+                    conn.send(reply.encode())
+                    print("Message help envoyé")
+                    data = conn.recv(1024).decode()
+                    print(f"Message reçu : {data}")
+
+            except:
+                print("Erreur de saisie")
+                conn.send(data.encode())
                 print("Message help envoyé")
                 data = conn.recv(1024).decode()
                 print(f"Message reçu : {data}")
+
+                #fichier = open('historique.txt', 'w')
+                #fichier.write(data + "\n")
+                #print("fait")
+                #fichier.close()
+
+            if platform.system() == "Linux" or platform.system() == "Darwin":
+                try:
+                    pong = data.split()[1] 
+                    print (pong)
+                    reply = os.system("ping -c 1 " + pong)
+                    if reply == 0:
+                        reply = os.popen(data).read()
+                        print("Le ping a fonctionné")
+                        conn.send(reply.encode())
+                        print("Message help envoyé")
+                        data = conn.recv(1024).decode()
+                        print(f"Message reçu : {data}")
+                        
+                    else:
+                        reply = "Network Error"
+                        print("Le ping n'a pas fonctionné")
+                        conn.send(reply.encode())
+                        print("Message help envoyé")
+                        data = conn.recv(1024).decode()
+                        print(f"Message reçu : {data}")
+
+                except:
+                    print("Erreur de saisie")
+                    data = conn.recv(1024).decode()
+                    print(f"Message reçu : {data}")
+
+                    #fichier = open('historique.txt', 'w')
+                    #fichier.write(data + "\n")
+                    #print("fait")
+                    #fichier.close()
             else:
-                reply = "Network Error"
-                print("Le ping n'a pas fonctionné")
-                conn.send(reply.encode())
                 print("Message help envoyé")
                 data = conn.recv(1024).decode()
                 print(f"Message reçu : {data}")
 
-        except:
-            print("Erreur de saisie")
-            conn.send("Erreur de saisie".encode())
-            #fichier = open('historique.txt', 'w')
-            #fichier.write(data + "\n")
-            #print("fait")
-            #fichier.close()
-
-
-
+                #fichier = open('historique.txt', 'w')
+                #fichier.write(data + "\n")
+                #print("fait")
+                #fichier.close()
     else:  
         #split apres :
         #verification 
@@ -152,13 +200,31 @@ while data != "kill":
         if verif == 0:
             conn.send(cmd.encode())
             print("Message help envoyé")
-            data = conn.recv(1024).decode()
-            print(f"Message reçu : {data}")
-
-
+#            data = conn.recv(1024).decode()
+#            print(f"Message reçu : {data}")
+            repver = "la commande a bien été executé"
+            conn.send(repver.encode())
         else:
+            if cmd == "":
+                    cmd = "la commande a bien marché "
+                    conn.send(cmd.encode())
+            else:
+                try:
+                    conn.send(cmd.encode())
+                except:
+                    cmd = "erreur d'envoi"
+                    conn.send(cmd.encode())   
+
+
+            
+
+               
+
+
+
+        
         #print("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
-            reply = ("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
+            reply = ("La commande n'existe pas ou la syntaxe est incorrecte cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
             conn.send(reply.encode())
             print("Message port envoyé")
             data = conn.recv(1024).decode()

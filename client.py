@@ -9,6 +9,7 @@ import shutil
 from PyQt6.QtGui import QShortcut, QKeySequence
 
 
+
 os = ("")
 cpu = psutil.cpu_count()
 name =("")
@@ -24,12 +25,28 @@ help =""
 
 port = 7000
 
+'''liretxt = open("servX.txt", "r")
+txt = liretxt.read()
+txt = liretxt.split("\n")
+liretxt.close()'''
+
+
 
 
 
 
 class client(QMainWindow):
     def __init__(self):
+        
+        '''self.clsocket = socket.socket()
+        self.message = ''
+        self.iskilled = False
+        self.__affichage = affichage
+
+    def connexion(self, host, port):
+        self.clsocket.connect((host, port))
+        thread = threading.Thread(target=self.reception)
+        thread.start()'''
         super().__init__()
         self.setWindowTitle("SAE 302")
         grid = QGridLayout()
@@ -46,7 +63,9 @@ class client(QMainWindow):
         #pingg = QPushButton("Ping")
         #porto= QPushButton("Port")
         #disque = QPushButton("Disque")
-        quitter = QPushButton("Quit")
+        quitter = QPushButton("Quit/KILL")
+        restart = QPushButton("Restart")
+        disconnect = QPushButton("Disconnect")
         self.label = QTextEdit("")
         help = QPushButton("Help")
         clear = QPushButton("clear")
@@ -56,6 +75,7 @@ class client(QMainWindow):
         self.__input = QLineEdit() 
         self.__input.setMaxLength(100)
         self.__input.setPlaceholderText("Entrez votre commande")
+
 
 #style css de l'interface
  
@@ -114,6 +134,12 @@ class client(QMainWindow):
         #self.__conn.setStyleSheet("color: white")
         #self.__conn.setStyleSheet("border-radius: 10px ,")
 
+#ajouter une addresse et un port dans servX.txt
+
+
+        
+      
+
 #PARTIE GRID
     
         grid.addWidget(rama, 0, 0)
@@ -126,6 +152,8 @@ class client(QMainWindow):
         #grid.addWidget(porto, 9, 0)
         #grid.addWidget(disque, 6, 0)
         grid.addWidget(quitter, 0  ,12)
+        grid.addWidget(restart, 1,12)
+        grid.addWidget(disconnect, 2,12)
         grid.addWidget(clear, 5,12)
         grid.addWidget(self.label, 0, 1, 5, 11)
         grid.addWidget(help,1,12)
@@ -144,14 +172,19 @@ class client(QMainWindow):
         #disque.clicked.connect(self.__actiondisque)
         envoyer.clicked.connect(self.__actionenvoyer)
         quitter.clicked.connect(self.__actionquitter)
+        #restart.clicked.connect(self.__actionrestart)
+        #disconnect.clicked.connect(self.__actiondisconnect)
         envoyer = QShortcut(QKeySequence("Return"), self)
         envoyer.activated.connect(self.__actionenvoyer)
+        historique = QShortcut(QKeySequence("up"), self)
+        #historique.activated.connect(self.__actionhistorique)
         help.clicked.connect(self.__actionhelp)
         clear.clicked.connect(self.__actionclear)
         #btn.clicked.connect(self.__actionbtn)
 
 #PARTIE FONCTION
     #def __actionenvoyer(self):
+    
 
     def __actionenvoyer(self):
         message = self.__input.text()
@@ -159,9 +192,15 @@ class client(QMainWindow):
         print("La requête a été envoyée")
         data = client_socket.recv(1024).decode()
         
+    
         print(f"Message du serveur : {data}")
         self.label.append(f"{data}\n")
         self.__actionreinitialiser()
+    
+    
+        
+
+
 
     def __actionreinitialiser(self):
         self.__input.clear()
@@ -175,6 +214,11 @@ class client(QMainWindow):
 
     def __actionquitter(self):
         self.close()
+    
+    '''def __actionrestart(self):
+        os.system("python3 client.py")
+        self.close()'''
+
 
 
 
