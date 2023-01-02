@@ -1,2 +1,6 @@
 ip 
 
+ip 
+ram 
+os 
+ip 

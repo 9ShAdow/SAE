@@ -7,21 +7,35 @@ import psutil
 import netaddr
 import shutil
 from PyQt6.QtGui import QShortcut, QKeySequence
+ 
 
 
 
 os = ("")
-cpu = psutil.cpu_count()
+cpu = int(psutil.cpu_count())
+ram = int(psutil.virtual_memory().percent)
 name =("")
 ip = socket.gethostbyname(name)
-host = "localhost"
+
 #netifaces.interfaces()
 stockage = ("")
 #adresse_ip = netifaces.ifaddresses('en0')[2][0]['addr'] # en0 = ethernet,si votre adresse ip est sur une autre interface il faudra changer "en0" par le nom de l'interface
 #netaddr_adresse_ip = netaddr.IPAddress(adresse_ip)
 stockage = shutil.disk_usage("/")
 help =""
+'''def __actionlireservX(self):
+    liretxt = open("servX.txt", "r")
+    txt = liretxt.read()
+    txt = liretxt.split(";")
+    host = txt[0]
+    port = txt[1]
 
+    
+
+    liretxt.close()
+    return txt'''
+
+host = "localhost"
 
 port = 7000
 
@@ -55,26 +69,25 @@ class client(QMainWindow):
         widget.setLayout(grid)
         self.resize(537, 250)
 
-        rama = QPushButton("RAM")
+        ram = QPushButton("RAM")
         cpuu = QPushButton("CPU")
         ipp = QPushButton("IP")
         oss = QPushButton("OS")
         namee = QPushButton("NAME")
-        #pingg = QPushButton("Ping")
-        #porto= QPushButton("Port")
-        #disque = QPushButton("Disque")
         quitter = QPushButton("Quit/KILL")
-        restart = QPushButton("Restart")
+        reset = QPushButton("Reset")
         disconnect = QPushButton("Disconnect")
         self.label = QTextEdit("")
         help = QPushButton("Help")
         clear = QPushButton("clear")
+        infom = QPushButton("Info Memoire")	
         envoyer = QPushButton("Envoyer")
         self.__conn = QPushButton("connect")
-        #en = QLabel("Entrer votre commande")
+        informations = QPushButton("Informations")
         self.__input = QLineEdit() 
         self.__input.setMaxLength(100)
         self.__input.setPlaceholderText("Entrez votre commande")
+
 
 
 #style css de l'interface
@@ -128,12 +141,10 @@ class client(QMainWindow):
             height: 0px;
             subcontrol-position: top;
             subcontrol-origin: margin;
-        }""")
+        }
+        """)
 
-        #quitter.setStyleSheet("color: #db7093")
-        #self.__conn.setStyleSheet("color: white")
-        #self.__conn.setStyleSheet("border-radius: 10px ,")
-
+       
 #ajouter une addresse et un port dans servX.txt
 
 
@@ -142,38 +153,39 @@ class client(QMainWindow):
 
 #PARTIE GRID
     
-        grid.addWidget(rama, 0, 0)
+        grid.addWidget(ram, 0, 0)
         grid.addWidget(cpuu, 1, 0)
         grid.addWidget(ipp, 2, 0)
         grid.addWidget(oss, 3, 0)
         grid.addWidget(namee, 4, 0)
         grid.addWidget(self.__conn,5,0)
-        #grid.addWidget(pingg, 5, 0)
-        #grid.addWidget(porto, 9, 0)
-        #grid.addWidget(disque, 6, 0)
+        grid.addWidget(informations, 4,12)
+        grid.addWidget(infom, 3,12)
         grid.addWidget(quitter, 0  ,12)
-        grid.addWidget(restart, 1,12)
+        grid.addWidget(reset, 1,12)
         grid.addWidget(disconnect, 2,12)
         grid.addWidget(clear, 5,12)
         grid.addWidget(self.label, 0, 1, 5, 11)
         grid.addWidget(help,1,12)
         grid.addWidget(envoyer, 5, 11)
         grid.addWidget(self.__input,  5,1,1,10)
+
         
 #PARTIE DES ACTIONS
 
-        rama.clicked.connect(self.__actionram)
+        ram.clicked.connect(self.__actionram)
         cpuu.clicked.connect(self.__actioncpu)
         ipp.clicked.connect(self.__actionip)
         oss.clicked.connect(self.__actionos)
         namee.clicked.connect(self.__actionname)
-        #porto.clicked.connect(self.__actionport)
-        #pingg.clicked.connect(self.__actionping)
-        #disque.clicked.connect(self.__actiondisque)
         envoyer.clicked.connect(self.__actionenvoyer)
         quitter.clicked.connect(self.__actionquitter)
+        reset.clicked.connect(self.__actionresetserver)
+        infom.clicked.connect(self._actionInfos)
+
         #restart.clicked.connect(self.__actionrestart)
         #disconnect.clicked.connect(self.__actiondisconnect)
+        informations.clicked.connect(self.__actioninformations)
         envoyer = QShortcut(QKeySequence("Return"), self)
         envoyer.activated.connect(self.__actionenvoyer)
         historique = QShortcut(QKeySequence("up"), self)
@@ -183,8 +195,31 @@ class client(QMainWindow):
         #btn.clicked.connect(self.__actionbtn)
 
 #PARTIE FONCTION
-    #def __actionenvoyer(self):
     
+    def __actionresetserver(self):
+        #reset du serveur
+        client_socket.send("reset".encode())
+        client_socket.close()
+        self.label.append("Le serveur a été reset")
+        print('Reset du serveur')
+
+        
+
+
+
+
+    def disconnect(self):
+        self.iskilled = True
+        client_socket.send("disconnect".encode())
+        client_socket.close()
+        print('Deconnexion du client')
+
+
+    def __actioninformations(self):
+        #informations : ip et nom de la machine
+        self.label.append("Le nom de la machine : " + socket.gethostname())
+        self.label.append("L'adresse IP : " + socket.gethostbyname(socket.gethostname()))
+        
 
     def __actionenvoyer(self):
         message = self.__input.text() 
@@ -328,7 +363,55 @@ class client(QMainWindow):
         data = client_socket.recv(1024).decode()
         print(f"Message du serveur : Le cpu est utilisé à {data} %")
         self.label.append(f"{data} \n")
-        
+
+    def _actionInfos(self):
+        diag = Infosmem()
+        diag.show()
+        diag.exec()
+    
+
+
+class Infosmem(QDialog):
+    def __init__(self):
+            super().__init__()
+            self.setWindowTitle("Utilisation de la memoire")
+            self.resize(250, 125)
+
+            self.__cpubar = QProgressBar()
+            self.__cpubar.setValue(cpu)
+            self.__cpubar.setFormat("CPU : %p%")
+            self.__cpubar.setStyleSheet("""
+            QProgressBar::chunk {
+                background-color: #ffc0cb;
+                padding-top: 1px;
+            }
+            QProgressBar:hover {
+                border: 1px solid #000000;
+                border-radius: 5px;
+                text-align: center;
+            """)
+            self.__cpubar.setTextVisible(True)
+            self.__rambar = QProgressBar()
+            
+            self.__rambar.setValue(ram)
+            self.__rambar.setFormat("RAM : %p%")
+            self.__rambar.setStyleSheet("""
+            QProgressBar::chunk {
+                background-color: #ffc0cb;
+                padding-top: 1px;
+            }
+            """)
+
+            #self.__rambar.setOrientation(Qt.Horizontal)
+            self.__rambar.setTextVisible(True)
+            
+
+            self.__grid = QGridLayout()
+            self.setLayout(self.__grid)
+            self.__grid.addWidget(self.__cpubar, 0, 0, 1, 1)
+            self.__grid.addWidget(self.__rambar, 1, 0, 1, 1)
+           
+
   
 
 

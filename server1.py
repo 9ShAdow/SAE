@@ -19,14 +19,7 @@ ram2 = ram[1]/1000000000
 ram3 = ram[3]/1000000000
 #IPAddr = socket.gethostbyname(host)
 
-'''ping = os.system("ping -c 1 " + host)
-if ping == 0:
-    pingstatus = "Network Active"
-    print("Le ping a fonctionné")
-else:
-    pingstatus = "Network Error"
-    print("Le ping n'a pas fonctionné")
-'''
+
 stockage = psutil.disk_usage("/")
 stockage1 = stockage[0]/1000000000
 stockage2 = stockage[1]/1000000000
@@ -44,6 +37,7 @@ ip = socket.gethostbyname(name)
 host = "localhost" # "", "127.0.0.1
 port = 7000
 
+
 server_socket = socket.socket()
 server_socket.bind((host, port))
 server_socket.listen(1)
@@ -55,7 +49,7 @@ print(f'Client connecté {address}')
 print("Socket sur l'adresse {} et le port {}".format(host, port))
 data = conn.recv(1024).decode()
 
-
+#reset = conn.reset = server_socket.reset
  
 while data != "kill":
     ip = socket.gethostbyname(name)
@@ -68,8 +62,26 @@ while data != "kill":
 
     
 
-    if data == "kill" or data == "kill":
+    if data == "kill" or data == "quit":
+        print("Fermeture du serveur")
+        conn.close()
         break
+    
+    
+    elif data == "reset" or data == "restart" or data == "reboot":
+                    print("Reset du serveur")
+                    print("Message envoyé")
+                    data = "reset"
+                    fichier = open('historique.txt', 'a')
+                    fichier.write(data + "\n")
+                    reply = print("fait")
+                    conn.send(reply.encode())
+                    
+                    print(f"Message reçu : {data}")
+
+
+
+
 
     elif data == "ram":
         reply = str(f"\nRAM Total: {round(ram1, 2)} GB \nRAM Disponible: {round(ram2,2)} GB \nRAM Utilisée : {round(ram3,2)} GB")  
@@ -311,58 +323,47 @@ while data != "kill":
 
 # = 0 on a un resultat 
         if verif == 0:
-            conn.send(cmd.encode())
-            print("Message help envoyé")
-#            data = conn.recv(1024).decode()
-#            print(f"Message reçu : {data}")
-            repver = "la commande a bien été executé"
-            conn.send(repver.encode())
+            for i in range (1):
+                print("la commande est valide")
+                conn.send(cmd.encode())
+                data = conn.recv(1024).decode()
+                print(f"Message reçu : {data}")
+                #repver = "la commande a bien été executé"
+                #conn.send(repver.encode())s
+            
+          
+
         else:
             if cmd == "":
                     cmd = "la commande n'existe pas "
                     conn.send(cmd.encode())
-                    pass
+                    print("Message help envoyé")
+                    data = conn.recv(1024).decode()
+                    print(f"Message reçu : {data}")
             else:
                 try:
                     conn.send(cmd.encode())
+                    print("Message help envoyé")
+                    data = conn.recv(1024).decode()
+                    print(f"Message reçu : {data}")
+
                 except:
                     cmd = "erreur d'envoi"
-                    conn.send(cmd.encode())   
-
-
-            
-
-               
-
-
+                    conn.send(cmd.encode()) 
+                    print("Message help envoyé")
+                    data = conn.recv(1024).decode()
+                    print(f"Message reçu : {data}")
 
         
+
+
+        ''' reply = ("traitement terminé")
+            conn.send(reply.encode())
+            print("Message envoyé")
+            data = conn.recv(1024).decode()
+            print(f"Message reçu : {data}")'''    
+        
         #print("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
-        '''reply = ("traitement terminé")
-        conn.send(reply.encode())
-        print("Message envoyé")
-        data = conn.recv(1024).decode()
-        print(f"Message reçu : {data}")'''
-            
-    
-
-        """platform.system() == "Windows"
-
-        val = os.system(data)
-
-        cmd = data.split(":")
-        #print(os.system(cmd[1]))
-        reply = str(os.system(cmd[1]))
-        conn.send(reply.encode())
-        print("Message help envoyé")
-        data = conn.recv(1024).decode()
-        #partie apres : va dans vartiable 
-        #os.system(cmd[1])   
-        reply = ("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
-        conn.send(reply.encode())
-        print("Message port envoyé")
-        data = conn.recv(1024).decode()
-        print(f"Message reçu : {data}")"""
     
 
 
