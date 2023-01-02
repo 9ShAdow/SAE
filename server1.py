@@ -10,6 +10,8 @@ import socket
 
 
 
+
+
 host = socket.gethostname()
 ram = psutil.virtual_memory() 
 ram1 = ram[0]/1000000000
@@ -63,6 +65,9 @@ while data != "kill":
     ficher.close()
     print(f"Message reçu : {data}")
 
+
+    
+
     if data == "kill" or data == "kill":
         break
 
@@ -74,7 +79,68 @@ while data != "kill":
         print(f"Message reçu : {data}")
 
    
+    elif data == "dercommande":
+        ficher = open("historique.txt", "r")
+        with open ("historique.txt", "r") as ficher:
+            derniere_ligne = ficher.readlines()[-2]
+            print(derniere_ligne)
+        reply = derniere_ligne
+        conn.send(reply.encode())
+        print("Message dercommande envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
 
+    elif data.startswith("dos:"):
+        try:
+            if platform.system() == "Windows":
+                win = data.split(":")
+                cmd = win[1]
+                #reply = os.system(cmd)
+                reply = os.popen(cmd[1]).read()
+                conn.send(reply.encode())
+                print(f"Message ", cmd ," envoyé")
+            else:
+                reply = "La commande DOS n'est pas disponible sur votre système d'exploitation"
+                conn.send(reply.encode())
+        except:
+            reply = "La commande DOS n'est pas disponible sur votre système d'exploitation"
+            #conn.send(reply.encode())
+
+    elif data.startswith("Linux:"):
+        try:
+            if platform.system() == "Linux":
+                lin = data.split(":")
+                cmd = lin[1]
+                #reply = os.system(cmd)
+                reply = os.popen(cmd[1]).read()
+                conn.send(reply.encode())
+                print(f"Message ", cmd ," envoyé")
+            else:
+                reply = "La commande Linux n'est pas disponible sur votre système d'exploitation"
+                conn.send(reply.encode())
+        except:
+            reply = "La commande Linux n'est pas disponible sur votre système d'exploitation"
+            conn.send(reply.encode())
+    
+    elif data.startswith("PowerShell:"):
+        try:
+            if platform.system() == "Windows":
+                win = data.split(":")
+                cmd = win[1]
+                #reply = os.system(cmd)
+                reply = os.popen(cmd[1]).read()
+                conn.send(reply.encode())
+                print(f"Message ", cmd ," envoyé")
+            else:
+                reply = "La commande PowerShell n'est pas disponible sur votre système d'exploitation"
+                conn.send(reply.encode())
+        except:
+            reply = "La commande PowerShell n'est pas disponible sur votre système d'exploitation"
+            conn.send(reply.encode())
+
+
+
+        
     elif data == "cpu":
         str_1 = psutil.cpu_percent()
         str_2 = psutil.cpu_percent(4)
@@ -100,7 +166,12 @@ while data != "kill":
         data = conn.recv(1024).decode()
         print(f"Message reçu : {data}")
 
-
+    elif data == "help":
+        reply = ("Commande disponible:\n \n - La commande ram permet d'afficher la ram totale, la ram utilisée et la ram libre \n - La commande ip permet d'afficher l'adresse ip de la machine \n  - La commande os permet d'afficher le nom et la version de l'os \n - La commande name permet d'afficher le nom de la machine \n - La commande port permet d'afficher le port utilisé \n - La commande cpu permet d'afficher le nombre de coeur de la machine \n - La commande disque permet d'afficher le stockage total, le stockage utilisé et le stockage libre") 
+        conn.send(reply.encode())
+        print("Message help envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
     elif data == "os":
         str_1 = platform.system()   
         str_2 = platform.release()
@@ -116,6 +187,48 @@ while data != "kill":
         print("Message help envoyé")
         data = conn.recv(1024).decode()
         print(f"Message reçu : {data}")
+
+    elif data == "python --version":
+        reply = sys.version
+        conn.send(reply.encode())
+        print("Message python --version envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+
+    elif data == "ls -la":
+        reply = os.popen(data).read()
+        conn.send(reply.encode())
+        print("Message ls -la envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")
+    elif data == "get-process":
+        try:
+            if platform.system() == "PowerShell":
+                reply = os.popen(data).read()
+                conn.send(reply.encode())
+                print("Message get-process envoyé")
+                data = conn.recv(1024).decode()
+                print(f"Message reçu : {data}")
+            else:
+                reply = "Commande non disponible"
+                conn.send(reply.encode())
+                print("Message get-process envoyé")
+                data = conn.recv(1024).decode()
+                print(f"Message reçu : {data}")
+        except:
+            print("Erreur de saisie")
+            conn.send(data.encode())
+            print("Message help envoyé")
+            data = conn.recv(1024).decode()
+            print(f"Message reçu : {data}")
+
+        #executer la commande sur powershell
+
+
+    #si data est vide ou nulle 
+    
+    
+
     
         
     elif data.startswith("ping"):
@@ -206,8 +319,9 @@ while data != "kill":
             conn.send(repver.encode())
         else:
             if cmd == "":
-                    cmd = "la commande a bien marché "
+                    cmd = "la commande n'existe pas "
                     conn.send(cmd.encode())
+                    pass
             else:
                 try:
                     conn.send(cmd.encode())
@@ -224,11 +338,11 @@ while data != "kill":
 
         
         #print("La commande n'existe pas cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
-            reply = ("La commande n'existe pas ou la syntaxe est incorrecte cliquer sur l'aider ou taper --help pour pour voir l'ensemble des commandes possibles")
-            conn.send(reply.encode())
-            print("Message port envoyé")
-            data = conn.recv(1024).decode()
-            print(f"Message reçu : {data}")
+        '''reply = ("traitement terminé")
+        conn.send(reply.encode())
+        print("Message envoyé")
+        data = conn.recv(1024).decode()
+        print(f"Message reçu : {data}")'''
             
     
 
@@ -250,6 +364,7 @@ while data != "kill":
         data = conn.recv(1024).decode()
         print(f"Message reçu : {data}")"""
     
+
 
 
 

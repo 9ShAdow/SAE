@@ -177,7 +177,7 @@ class client(QMainWindow):
         envoyer = QShortcut(QKeySequence("Return"), self)
         envoyer.activated.connect(self.__actionenvoyer)
         historique = QShortcut(QKeySequence("up"), self)
-        #historique.activated.connect(self.__actionhistorique)
+        historique.activated.connect(self.__uphistorique)
         help.clicked.connect(self.__actionhelp)
         clear.clicked.connect(self.__actionclear)
         #btn.clicked.connect(self.__actionbtn)
@@ -187,17 +187,61 @@ class client(QMainWindow):
     
 
     def __actionenvoyer(self):
-        message = self.__input.text()
-        client_socket.send(message.encode())
-        print("La requête a été envoyée")
-        data = client_socket.recv(1024).decode()
+        message = self.__input.text() 
+
+        '''if message == "" or message == " " or message.startswith(" "):
+            self.__input.setText("")
+            self.__input.setPlaceholderText("ERREUR DE SAISIE !")'''
+        if message == "" or message == " " or message.startswith(" "):
+            self.__input.setText("")
+            self.__input.setPlaceholderText("ERREUR DE SAISIE !")
+        elif message == "help":
+            client_socket.send(message.encode())
+            self.label.append("help : Affiche la liste des commandes disponibles\n")
+            self.label.append("clear : Efface l'historique des commandes\n")
+            self.label.append("quit : Quitte le client\n")
+            self.label.append("restart : Redémarre le serveur\n")
+            self.label.append("disconnect : Déconnecte le client du serveur\n")
+            self.label.append("ram : Affiche l'utilisation de la RAM\n")
+            self.label.append("cpu : Affiche l'utilisation du CPU\n")
+            self.label.append("ip : Affiche l'adresse IP du serveur\n")
+            self.label.append("os : Affiche le nom de l'OS\n")
+            self.label.append("name : Affiche le nom du serveur\n")
+            self.label.append("port : Affiche le port du serveur\n")
+            self.label.append("ping : Affiche le ping du serveur\n")
+            self.label.append("disk : Affiche l'utilisation du disque dur\n")
+            self.__actionreinitialiser()
+        elif message == "clear":
+            self.label.setText("")
+            self.__actionreinitialiser()
+        elif message == "quit" or message == "exit" or message == "kill":
+
+            self.close()
+        else:
+            message = self.__input.text()
+            client_socket.send(message.encode())
+
+            print("La requête a été envoyée")
+            data = client_socket.recv(1024).decode()
         
     
+            print(f"Message du serveur : {data}")
+            self.label.append(f"{data}")
+            self.__actionreinitialiser()
+        
+        
+    
+    def __uphistorique(self):
+        message = "dercommande"
+        client_socket.send(message.encode())
+        print("La requête pour la ram a été envoyée")
+
+        data = client_socket.recv(1024).decode()
         print(f"Message du serveur : {data}")
-        self.label.append(f"{data}\n")
-        self.__actionreinitialiser()
-    
-    
+        
+        #self.__label.append(f"{data}")
+
+        #self.__input.setPlaceholderText(f"{data}")
         
 
 
@@ -235,9 +279,8 @@ class client(QMainWindow):
             \n \n - La commande ip permet d'afficher l'adresse ip de la machine \
             \n \n  - La commande os permet d'afficher le nom et la version de l'os\
             \n \n - La commande name permet d'afficher le nom de la machine\
-            \n \n - La commande port permet d'afficher le port utilisé  \
-            \n \n - La commande cpu permet d'afficher le nombre de coeur de la machine \
-            \n \n - La commande disque permet d'afficher le stockage total, le stockage utilisé et le stockage libre")
+            \n \n - La commande cpu permet d'afficher les statistiques du cpu \
+            \n \n - La commande mkdir permet de créer un dossier ")
         message.exec()   
     
 
