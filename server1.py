@@ -66,21 +66,6 @@ while data != "kill":
         print("Fermeture du serveur")
         conn.close()
         break
-    
-    
-    elif data == "reset" or data == "restart" or data == "reboot":
-                    print("Reset du serveur")
-                    print("Message envoyé")
-                    data = "reset"
-                    fichier = open('historique.txt', 'a')
-                    fichier.write(data + "\n")
-                    reply = print("fait")
-                    conn.send(reply.encode())
-                    
-                    print(f"Message reçu : {data}")
-
-
-
 
 
     elif data == "ram":

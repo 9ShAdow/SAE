@@ -7,9 +7,9 @@ This project goal is to communicate a client and one or more servers through a G
 In the following doc i will explain how you can do the same thing 
 
 
-1. [__What/How intall the the packages ?__](#Comment-installer-les-outils-nécéssaires)
-2. [__How to start ?__](#Comment-démarrer-les-outils)
-3. [__How to use the GUI ?__](#Comment-utiliser-le-client)
+1. [__What/How intall the the packages ?__](#What/How-intall-the-the-packages)
+2. [__How to start ?__](#How-to-start-?)
+3. [__How to use the GUI ?__](#How-to-use-the-GUI-?)
 
 
 
@@ -38,9 +38,9 @@ In the following doc i will explain how you can do the same thing
 ## How to start ?
 
 The first thing to do is run the server1.py file,
-once you have run this file you can run the client.py file.
+once you have run it file you can start the client.py.
 
-You must run this two file with python or python3
+You must run this two file with python or python3.
 
 
 # Now we are ready to start!
@@ -74,4 +74,4 @@ The button on the GUI will return some of this request to the user
 
 
 
-<pre>TEFANG Ivab RT222 <pre>
+<pre>TEFANG Ivan RT222 <pre>

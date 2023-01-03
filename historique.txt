@@ -4,3 +4,12 @@ ip
 ram 
 os 
 ip 
+cpu 
+ram 
+ip 
+os 
+name 
+dercommande 
+dercommande 
+ip 
+dercommande 
