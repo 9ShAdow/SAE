@@ -17,11 +17,7 @@ On the right side of the window are the general commands that the client can sen
 -ip etc.
 The central part is divided into two parts, a large window that allows you to display the results of the various commands and a lower part to enter all of the desired commands. Finally, the right part contains the set of disconnection and clear commands as well as help and information on using the Server.
 
-Here is an overview that will allow you to better understand the structure of the application.
-
-
-(DOCUMENTATION\GUI.png "GUI")
-
+You had an overview that will allow you to better understand the structure of the application (DOCUMENTATION\GUI.png).
 
 
 ## How is my code structured?
