@@ -52,7 +52,7 @@ As well as the part that launches the application, that is the __name__ == "__ma
 I did the intermediate project. So I did the server and the client, in the form of a graphical application. You can click on the buttons in the application to perform the commands.
 I didn’t manage to do the hard part however, I was able to display the graph on the use of CPU and RAM. So I made an application that allows to connect only one client to the server.
 
-I found this CAS very interesting and rewarding and I really would have liked to complete it.
+I found this SAE very interesting and rewarding and I really would have liked to complete it.
 So I’m going to try to work on it in my spare time to get even more skills. 
 
 
